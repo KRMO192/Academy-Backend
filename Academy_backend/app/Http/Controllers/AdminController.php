@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\API\BaseController as BaseController;
+use Validator;
+use Auth;
 
-class AdminController extends Controller
+class AdminController extends BaseController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $admins=Admin::latest()->get();
+        return $this->sendResponse(BaseController::collection($admins),'All Admins');
     }
 
     /**
@@ -28,7 +33,25 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user_type = Auth::user()->type;
+        if($user_type == 'admin' ){           // If the user who wants to create a student account is a Admin
+            $input = $request->all();
+            $user_id = Auth::user()->id;
+            $input["user_id"]=$user_id;
+            $validate=validator::make($input,[
+                'name' => 'required',
+                'brith_date' => 'required',
+                'phone' => 'required',
+                'user_id' => 'required'
+            ]);
+
+            if($validate->fails()){
+                return $this->sendError('Validate error', $validate->errors());
+            }
+
+            $admin=Admin::create($input);
+            return $this->sendResponse($admin,'Admin added successfully');
+        }
     }
 
     /**
@@ -58,8 +81,11 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Admin $admin)
+    public function destroy($id)
     {
-        //
+        $admin=Admin::find($id)->forceDelete();
+        if($admin == true){
+            return $this->sendResponse($admin,'admin deleted successfully');
+        }
     }
 }

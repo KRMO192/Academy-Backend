@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-
+use App\Models\Instructor;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Student;
 
 
 class Course extends Model
@@ -32,7 +34,7 @@ class Course extends Model
      */
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(Studente::class, 'course_student', 'course_id', 'student_id');
+        return $this->belongsToMany(Studente::class, 'student_course', 'course_id', 'student_id');
     }
 
 

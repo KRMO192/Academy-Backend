@@ -53,25 +53,25 @@ class StudentController extends BaseController
         if($user_type == 'student' ){           // If the user who wants to create a student account is a Student
             $input = $request->all();
             $user_id = Auth::user()->id;
+            $input["user_id"]=$user_id;
             $validate=validator::make($input,[
                 'name' => 'required',
                 'student_image' => 'required',
                 'address' => 'required',
                 'bio' => 'required',
-                'phone' => 'required'
+                'phone' => 'required',
+                'user_id' => 'required'
             ]);
-
-
 
             if($validate->fails()){
                 return $this->sendError('Validate error', $validate->errors());
             }
 
-            if ($image=$request->file('image')) {
+            if ($image=$request->file('student_image')) {
                 $destinationPath='images/students/';
                 $studentImage=date('YmdHis').".".$image->getClientOriginalExtension();
                 $image->move($destinationPath,$studentImage);
-                $input['image']="$studentImage";
+                $input['student_image']="$studentImage";
             }
 
             $student=Student::create($input);
@@ -185,11 +185,11 @@ class StudentController extends BaseController
                 return $this->sendError('Validate error', $validate->errors());
             }
 
-            if ($image=$request->file('image')) {
+            if ($image=$request->file('student_image')) {
                 $destinationPath='images/students/';
                 $studentImage=date('YmdHis').".".$image->getClientOriginalExtension();
                 $image->move($destinationPath,$studentImage);
-                $input['image']="$studentImage";
+                $input['student_image']="$studentImage";
                 $student->student_image=$input['student_image'];
             }else{
                 unset($input['image']);
@@ -216,20 +216,25 @@ class StudentController extends BaseController
         $auth_id=auth()->user()->id;                // get user id who want to show this page (id from users tabel)
         $type=auth()->user()->type;                 // get user type want to show this page (id from users tabel)
         if ($auth_id==$u_id || $type == "admin" ) {
-
         $student=Student::find($id)->delete();
         return $this->sendResponse($student,'student deleted successfully');
         }else{
             return $this->sendError('You do not have permission to delete this student');
         }
-
     }
+
+
     public function forceDelete($id)
     {
         $student=Student::onlyTrashed()->where('id',$id)->forceDelete();
-        return $this->sendResponse($student,'student deleted successfully');
-
+        if($student == true){
+            return $this->sendResponse($student,'student deleted successfully');
+        }else{
+            return $this->sendError('you must first send this account to the trash');
+        }
     }
+
+
     public function back($id)
     {
         $student=Student::onlyTrashed()->where('id',$id)->first()->restore();

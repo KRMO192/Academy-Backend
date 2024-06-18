@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة الدورات</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .course-list {
+            list-style: none;
+            padding: 0;
+        }
+        .course-item {
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        .course-item:hover {
+            background-color: #f9f9f9;
+        }
+        .course-title {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        .course-description {
+            font-size: 1em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>قائمة الدورات</h1>
+        </div>
+
+        <!-- سيتم توليد هذه القائمة ديناميكيًا باستخدام JavaScript و API -->
+        <ul class="course-list">
+            <!-- مثال على عنصر في القائمة -->
+            <li class="course-item">
+                <h2 class="course-title">اسم الدورة</h2>
+                <p class="course-description">وصف الدورة</p>
+                <!-- يمكن إضافة المزيد من التفاصيل حسب الحاجة -->
+            </li>
+
+            <!-- ستتكرر عناصر القائمة هنا -->
+        </ul>
+    </div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchCourses();
+    });
+
+    function fetchCourses() {
+        // استبدل 'your-api-url' بالرابط الفعلي لـ API الخاص بك
+        fetch('http://127.0.0.1:8000/api/student/courses')
+            .then(response => response.json())
+            .then(data => {
+                const courses = data.data; // تأكد من أن هذا يتوافق مع تنسيق البيانات المستجابة من API
+                const courseList = document.querySelector('.course-list');
+                courses.forEach(course => {
+                    const li = document.createElement('li');
+                    li.className = 'course-item';
+                    li.innerHTML = `
+                        <h2 class="course-title">${course.title}</h2>
+                        <p class="course-description">${course.description}</p>
+                    `;
+                    courseList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
+</html>

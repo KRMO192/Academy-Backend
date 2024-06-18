@@ -14,6 +14,7 @@ use App\Models\User;
 
 class RegisterController extends BaseController
 {
+
     public function Register(Request $request )
     {
         $validator = Validator::make($request->all(),[
@@ -33,7 +34,7 @@ class RegisterController extends BaseController
         $success['token'] = $user->createToken('tokenKey')->accessToken;
         $success['name'] = $user->name;
 
-        return $this->sendResponse($success , 'uesr registered successfully');
+        return ($this->sendResponse($success , 'uesr registered successfully') &&  redirect('login'));
     }
 
 
@@ -54,7 +55,7 @@ class RegisterController extends BaseController
 
                 return $this->sendResponse($success , 'student login successfully');
 
-                return redirect()->route('students');
+//                return redirect()->route('students');
             }else if (auth()->user()->type == 'instructor') {
                 $user = Auth::user();
                 $success['token'] = $user->createToken('tokenKey')->accessToken;
@@ -88,4 +89,6 @@ class RegisterController extends BaseController
         }
 
     }
+
+
 }

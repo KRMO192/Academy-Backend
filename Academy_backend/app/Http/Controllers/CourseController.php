@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CourseResource;
 use App\Models\Course;
+use App\Models\User;
+use App\Models\Instructor;
+use App\Http\Resources\CourseResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use Validator;
@@ -21,8 +23,12 @@ class CourseController extends BaseController
      */
     public function index()
     {
-        $courses=Course::latest()->get() ;
-        return $this->sendResponse(CourseResource::collection($courses),'All courses');
+
+        $courses = Course::all(); // جلب جميع الدورات من قاعدة البيانات
+        return view('courses', ['courses' => $courses]);
+
+         $courses=Course::latest()->get() ;
+         return $this->sendResponse(CourseResource::collection($courses),'All courses');
     }
 
 
@@ -46,26 +52,28 @@ class CourseController extends BaseController
      */
     public function store(Request $request)
     {
-        $input=$request->all();
+        // dd($request->all());
         $input=$request->all();
         $user_id=Auth::user()->id;
-        $input['user_id']=$user_id;
+        $instructor=Instructor::where("user_id",$user_id)->firstOrFail();
+        $instructor_id=$instructor->id;
+        $input['instructor_id']=$instructor_id;
         $validate=validator::make($input,[
-            'title' => 'required',
-            'description' => 'required',
+            'title'         => 'required',
+            'description'   => 'required',
             'instructor_id' => 'required',
-            'status' => 'required'
+            'status'        => 'required'
         ]);
 
         if($validate->fails()){
             return $this->sendError('Validate error', $validate->errors());
         }
 
-        if ($image=$request->file('image')) {
+        if ($image=$request->file('course_image')) {
             $destinationPath='images/courses';
-            $courseImage=date('YmdHis').".".$image->getClientOriginalExtention();
+            $courseImage=date('YmdHis').".".$image->getClientOriginalExtension();
             $image->move($destinationPath,$courseImage);
-            $input['image']="$courseImage";
+            $input['course_image']="$courseImage";
         }
 
         $course=Course::create($input);

@@ -6,6 +6,8 @@ use App\Http\Controllers\API\RegisterController as RegisterController;
 use App\Http\Controllers\StudentController as StudentController;
 use App\Http\Controllers\CourseController as CourseController;
 use App\Http\Controllers\InstructorController as InstructorController;
+use App\Http\Controllers\AdminController as AdminController;
+use App\Http\Controllers\JoinToCourseController as JoinToCourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,10 +37,37 @@ Route::middleware(['auth:api','user-access:student'])->group(function () {
     Route::put('student/update/{id}', [StudentController::class,'update']);
     Route::delete('student/delete/{id}', [StudentController::class,'softDelete']);
     Route::get('student/courses', [CourseController::class,'index']);
+    Route::get('student/course/{id}', [CourseController::class,'show']);
+    Route::post('enroll-student', [JoinToCourseController::class,'enrollStudentToCourse']);
+    Route::post('withdraw-student', [JoinToCourseController::class,'withdrawStudentFromCourse']);
+});
+
+
+// instructor Routes List
+Route::middleware(['auth:api','user-access:instructor'])->group(function () {
+
+    Route::post('instructor/create', [InstructorController::class,'store']);
+    Route::get('instructor/show/{id}', [InstructorController::class,'show']);
+    Route::put('instructor/update/{id}', [InstructorController::class,'update']);
+    Route::delete('instructor/delete/{id}', [InstructorController::class,'softDelete']);
+
+    Route::get('instructor/show/courses', [CourseController::class,'index']);
+    Route::get('instructor/show/trashed/courses', [CourseController::class,'trashedCourses']);
+    Route::get('instructor/show/course/{id}', [CourseController::class,'show']);
+    Route::post('instructor/create/course', [CourseController::class,'store']);
+    Route::put('instructor/update/course/{id}', [CourseController::class,'update']);
+    Route::delete('instructor/delete/course/{id}', [CourseController::class,'softDelete']);
+    Route::delete('instructor/forcedelete/course/{id}', [CourseController::class,'forceDelete']);
+    Route::post('instructor/retrive/course/{id}', [CourseController::class,'back']);
 });
 
 // admin Route List
 Route::middleware(['auth:api','user-access:admin'])->group(function () {
+        //admins
+    Route::get('admin/show/admins', [AdminController::class ,'index']);
+    Route::post('admin/create/admin', [AdminController::class,'store']);
+    Route::delete('admin/delete/admin/{id}', [AdminController::class,'destroy']);
+
         //courses
     Route::get('admin/show/courses', [CourseController::class,'index']);
     Route::get('admin/create/courses', [CourseController::class,'store']);
@@ -53,31 +82,20 @@ Route::middleware(['auth:api','user-access:admin'])->group(function () {
     Route::delete('admin/forcedelete/student/{id}', [StudentController::class,'forceDelete']);
     Route::post('admin/retrieve/student/{id}', [StudentController::class,'back']);
 
+        // instructors
+    Route::get('admin/show/instructors', [InstructorController::class,'index']);
+    Route::get('admin/show/trashed/instructors', [InstructorController::class,'trachedStudents']);
+    Route::post('admin/create/instructor', [InstructorController::class,'store']);
+    Route::put('admin/update/instructor/{id}', [InstructorController::class,'update']);
+    Route::get('admin/show/instructor/{id}', [InstructorController::class,'show']);
+    Route::delete('admin/delete/instructor/{id}', [InstructorController::class,'softDelete']);
+    Route::delete('admin/forcedelete/instructor/{id}', [InstructorController::class,'forceDelete']);
+    Route::post('admin/retrieve/instructor/{id}', [InstructorController::class,'back']);
+
+
+
+
 });
-
-
-
-
-
-
-
-
-
-
-// instructor Routes List
-
-Route::middleware(['auth:api', 'user-access:instructor'])->group(function () {
-    Route::resource('instructor/courses', CourseController::class);
-});
-
-
-
-
-
-
-
-
-
 
 
 
